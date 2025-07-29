@@ -3,6 +3,5 @@ uvicorn
 python-multipart
 openai
 supabase
-google-cloud-aiplatform
 pillow
 python-dotenv
