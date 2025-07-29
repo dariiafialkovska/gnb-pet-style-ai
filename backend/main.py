@@ -35,9 +35,9 @@ async def generate(file: UploadFile = File(...)):
             model="gpt-image-1",
             image=image_file,
             prompt="The same dog wearing a cozy GNB-branded hoodie, photorealistic, soft lighting, studio background",
-            size="1024x1024",
-            response_format="b64_json"
+            size="1024x1024"
         )
+
 
         img_b64 = response.data[0].b64_json
         return {"b64_json": img_b64}
