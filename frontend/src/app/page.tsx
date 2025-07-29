@@ -5,6 +5,7 @@ import Header from './components/Header';
 import UploadSection from './components/UploadSection';
 import FinalSection from './components/FinalSection';
 import LoadingPreview from './components/LoadingPreview'; // adjust the path
+import { generateImageWithOpenAI } from "@/lib/api"; // adjust the path
 
 export default function GNBStylerPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -24,14 +25,21 @@ export default function GNBStylerPage() {
       setMode('upload');
     }
   };
-
-  const handleGenerate = async () => {
-    if (!file) return;
+const handleGenerate = async () => {
+  if (!file) return;
+  try {
     setMode('loading');
-    await new Promise((r) => setTimeout(r, 3000));
-    setAiImage('data:image/svg+xml;base64,...');
+
+    const result = await generateImageWithOpenAI(file);
+    setAiImage(result);
+
     setMode('result');
-  };
+  } catch (err) {
+    alert("Something went wrong");
+    console.error(err);
+    setMode('upload');
+  }
+};
 
   useEffect(() => {
     if (aiImage) setSliderValue(50);
