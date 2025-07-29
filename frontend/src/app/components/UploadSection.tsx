@@ -1,59 +1,59 @@
 import React, { useState } from 'react';
-import { Upload } from 'lucide-react';
-
-const EXAMPLES = [
-  { before: '/example-before.jpg', after: '/example-after.jpg' },
-  { before: '/example2-before.jpg', after: '/example2-after.jpg' },
-  { before: '/example3-before.jpg', after: '/example3-after.jpg' },
+import { Upload, Sparkles } from 'lucide-react';
+import ExampleCarousel from './ExampleCarousel';
+import CustomButton from './CustomButton';
+const SCENARIOS = [
+  { label: 'Lemon Fresh Morning', color: '#fef08a' },
+  { label: 'Lavender Chill Evening', color: '#c084fc' },
+  { label: 'Orange Grove Adventure', color: '#f59e0b' },
+  { label: 'Grapefruit Getaway', color: '#f87171' },
+  { label: 'Mahogany Coconut Lounge', color: '#92400e' },
 ];
-
-function ExampleCarousel() {
-  const [index, setIndex] = useState(0);
-  const total = EXAMPLES.length;
-  const go = (dir: number) => setIndex(i => (i + dir + total) % total);
-
-  return (
-    <div className="w-full max-w-xs mx-auto flex flex-col items-center">
-      <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-gray-100 shadow-lg flex items-center justify-center">
-        <img src={EXAMPLES[index].before} alt="Before" className="w-1/2 h-full object-cover absolute left-0 top-0" />
-        <img src={EXAMPLES[index].after} alt="After" className="w-1/2 h-full object-cover absolute right-0 top-0" />
-        {/* Arrows */}
-        <button onClick={() => go(-1)} className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-[var(--color-main)] rounded-full p-1 shadow-md z-10">
-          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" /></svg>
-        </button>
-        <button onClick={() => go(1)} className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-[var(--color-main)] rounded-full p-1 shadow-md z-10">
-          <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" /></svg>
-        </button>
-      </div>
-      {/* Dots */}
-      <div className="flex justify-center mt-2 gap-2">
-        {EXAMPLES.map((_, i) => (
-          <button key={i} onClick={() => setIndex(i)} className={`w-2.5 h-2.5 rounded-full ${i === index ? 'bg-[var(--color-main)]' : 'bg-gray-300'}`}></button>
-        ))}
-      </div>
-      <div className="flex justify-between w-full mt-2 text-xs text-gray-500">
-        <span>Before</span>
-        <span>After</span>
-      </div>
-    </div>
-  );
-}
 
 type UploadSectionProps = {
   file: File | null;
+  previewUrl: string | null;
+  mode: 'upload' | 'loading' | 'result';
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleGenerate: (scenario: string) => void;
 };
 
-export default function UploadSection({ file, handleFileChange }: UploadSectionProps) {
+
+export default function UploadSection({
+  file,
+  previewUrl,
+  handleFileChange,
+  handleGenerate,
+}: UploadSectionProps) {
+  const [dragging, setDragging] = useState(false);
+  const [selectedScenario, setSelectedScenario] = useState(SCENARIOS[0].label);
+
+  const handleDrop = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragging(false);
+    const droppedFile = e.dataTransfer.files?.[0];
+    if (droppedFile) {
+      const fakeEvent = {
+        target: { files: [droppedFile] },
+      } as unknown as React.ChangeEvent<HTMLInputElement>;
+      handleFileChange(fakeEvent);
+    }
+  };
+
   return (
-    <div className="bg-[#f4f9f6] p-6 sm:p-8 border-b w-full flex flex-col md:flex-row items-center md:items-start gap-8">
-      {/* Left: Texts and Upload */}
-      <div className="flex-1 flex flex-col items-center md:items-start">
-        <h2 className="text-2xl font-bold text-[var(--color-main)] mb-2 text-center md:text-left">Unleash Your Pup's Style!</h2>
-        <p className="text-gray-600 mb-6 text-center md:text-left max-w-xs">
-          Upload a photo of your dog and let our AI give them a fabulous GNB-inspired makeover. See the magic happen in one click!
+    <div className="w-full flex flex-col lg:flex-row gap-10 px-4 py-10 sm:px-10 md:px-16 lg:px-20 xl:px-24 h-full justify-center">
+      {/* LEFT SIDE */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center lg:justify-center">
+        <h2 className="text-2xl sm:text-3xl font-bold text-[var(--color-main)] mb-3 text-center lg:text-left">
+          Unleash Your Pup's Style!
+        </h2>
+        <p className="text-gray-600 mb-6 text-center lg:text-left max-w-md">
+          Upload a photo of your dog and let our AI give them a fabulous GNB-inspired makeover.
         </p>
-        <div className="relative mb-2 w-full max-w-xs">
+
+        {/* Upload Box */}
+        <div className="relative w-full max-w-md mb-6">
           <input
             type="file"
             accept="image/*"
@@ -63,25 +63,72 @@ export default function UploadSection({ file, handleFileChange }: UploadSectionP
           />
           <label
             htmlFor="file-upload"
-            className="flex flex-col items-center justify-center w-full h-32 sm:h-40 border-2 border-dashed border-[var(--color-main)] rounded-xl cursor-pointer hover:bg-[var(--color-main)]/10 transition-all duration-200 group"
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragging(true);
+            }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={handleDrop}
+            className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 group ${dragging ? 'bg-[var(--color-main)]/10 border-[var(--color-main)]' : 'border-[var(--color-main)]'
+              }`}
           >
-            <div className="flex flex-col items-center">
-              <Upload className="w-8 h-8 text-[var(--color-main)] mb-2 group-hover:scale-110 transition-transform" />
-              <span className="text-[var(--color-main)] font-medium text-center">
-                {file ? (file as File).name : 'Click to upload photo'}
-              </span>
-              <span className="text-[var(--color-main)] text-sm mt-1">
-                PNG, JPG up to 10MB
-              </span>
-            </div>
+            <Upload className="w-8 h-8 text-[var(--color-main)] mb-2 group-hover:scale-110 transition-transform" />
+            <span className="text-[var(--color-main)] font-medium text-center">
+              {file ? file.name : 'Click or drag to upload photo'}
+            </span>
+            <span className="text-[var(--color-main)] text-sm mt-1">PNG, JPG up to 10MB</span>
           </label>
         </div>
+
+        {/* Scenario Selector */}
+        <div className="mb-6 w-full max-w-md">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Scenario:</label>
+          <div className="flex flex-wrap gap-2">
+            {SCENARIOS.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => setSelectedScenario(item.label)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-150 ${selectedScenario === item.label
+                  ? 'border-[var(--color-main)] bg-[var(--color-main)]/10'
+                  : 'border-gray-300 bg-white hover:border-[var(--color-main)]'
+                  }`}
+              >
+                <span
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: item.color }}
+                />
+                <span className="text-sm text-black whitespace-nowrap">
+                  {item.label}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
-      {/* Right: Example Carousel */}
-      <div className="flex-1 flex flex-col items-center">
-        <span className="mb-2 text-gray-500 text-sm">See the magic:</span>
-        <ExampleCarousel />
+
+      {/* RIGHT SIDE */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center">
+        {previewUrl ? (
+          <div className="w-full max-w-md flex flex-col items-center">
+            <div className="aspect-square w-full rounded-xl overflow-hidden shadow-md bg-gray-100 mb-4">
+              <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+            </div>
+
+
+
+            <CustomButton
+              onClick={() => handleGenerate(selectedScenario)}
+              className=''
+            >
+              Generate GNB Look</CustomButton>
+          </div>
+        ) : (
+          <>
+            <ExampleCarousel />
+          </>
+        )}
       </div>
     </div>
   );
-} 
+}
