@@ -7,7 +7,7 @@ import FinalSection from './components/FinalSection';
 import LoadingPreview from './components/LoadingPreview';
 import { generateImageWithOpenAI } from '@/lib/api';
 
-export default function GNBStylerPage() {
+export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [aiImage, setAiImage] = useState<string | null>(null);
