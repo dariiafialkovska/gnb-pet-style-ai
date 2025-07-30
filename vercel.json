@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend/next.config.js",
+      "src": "next.config.js",
       "use": "@vercel/next"
     },
     {
@@ -12,7 +12,6 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/backend/vercel_python_entry.py" },
-    { "src": "/(.*)", "dest": "/frontend/$1" }
+    { "src": "/api/(.*)", "dest": "/backend/vercel_python_entry.py" }
   ]
 }
