@@ -46,7 +46,7 @@ export default function UploadSection({
       {/* LEFT SIDE */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center lg:justify-center">
         <h2 className="text-2xl sm:text-3xl font-bold text-[var(--color-main)] mb-3 text-center lg:text-left">
-          Unleash Your Pup's Style!
+          Unleash Your Pup&apos;s Style!
         </h2>
         <p className="text-gray-600 mb-6 text-center lg:text-left max-w-md">
           Upload a photo of your dog and let our AI give them a fabulous GNB-inspired makeover.
