@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export async function generateImageWithOpenAI(file: File): Promise<string> {
   const formData = new FormData();
@@ -11,10 +11,21 @@ export async function generateImageWithOpenAI(file: File): Promise<string> {
     body: formData,
   });
 
-  const data = await res.json();
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    const text = await res.text();
+    console.error("❌ Non-JSON response from backend:", text);
+    throw new Error("Server error (non-JSON)");
+  }
+
+  if (!res.ok) {
+    throw new Error(data.error || "Server error");
+  }
 
   console.log("📩 Response from /generate:", data);
 
   if (data.image_url) return data.image_url;
-  throw new Error(data.error || "Failed to generate image");
+  throw new Error("Failed to generate image");
 }
