@@ -11,21 +11,23 @@ export async function generateImageWithOpenAI(file: File): Promise<string> {
     body: formData,
   });
 
-  let data;
-  try {
-    data = await res.json();
-  } catch (err) {
-    const text = await res.text();
-    console.error("❌ Non-JSON response from backend:", text);
-    throw new Error("Server error (non-JSON)");
-  }
+  const raw = await res.text(); // 🔐 Only read once!
 
   if (!res.ok) {
-    throw new Error(data.error || "Server error");
+    console.error("❌ Backend error response:", raw);
+    throw new Error("Server error");
+  }
+
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch (err) {
+    console.error("❌ Invalid JSON from backend:", raw);
+    throw new Error("Server returned invalid JSON");
   }
 
   console.log("📩 Response from /generate:", data);
 
   if (data.image_url) return data.image_url;
-  throw new Error("Failed to generate image");
+  throw new Error(data.error || "Failed to generate image");
 }
