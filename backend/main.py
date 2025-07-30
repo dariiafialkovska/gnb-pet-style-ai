@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-from routes.generate import router as generate_router
+from .routes.generate import router as generate_router
 
 app = FastAPI()
 app.add_middleware(
