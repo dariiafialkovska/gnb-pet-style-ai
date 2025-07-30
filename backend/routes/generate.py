@@ -4,7 +4,6 @@ from io import BytesIO
 import base64
 import os
 from openai import OpenAI
-from google.cloud import aiplatform_v1
 from convert_to_png import convert_to_png
 from services.supabase_uploader import upload_image_to_supabase
 
