@@ -13,7 +13,6 @@ const SCENARIOS = [
 type UploadSectionProps = {
   file: File | null;
   previewUrl: string | null;
-  mode: 'upload' | 'loading' | 'result';
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleGenerate: (scenario: string) => void;
 };
