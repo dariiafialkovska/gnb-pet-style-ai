@@ -4,8 +4,8 @@ from io import BytesIO
 import base64
 import os
 from openai import OpenAI
-from convert_to_png import convert_to_png
-from services.supabase_uploader import upload_image_to_supabase
+from ..convert_to_png import convert_to_png
+from ..services.supabase_uploader import upload_image_to_supabase
 
 router = APIRouter()
 
