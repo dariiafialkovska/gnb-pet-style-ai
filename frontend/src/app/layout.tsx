@@ -13,8 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GNB AI Dog Styler",
+  title: "Good Natured AI Look Generator | Good Natured Brand",
   description: "Transform your dog's look with AI!",
+  icons: {
+    icon: [
+      { url: '/good-natured-brand-icon.svg', type: 'image/svg+xml' }
+    ],
+  },
 };
 
 export default function RootLayout({

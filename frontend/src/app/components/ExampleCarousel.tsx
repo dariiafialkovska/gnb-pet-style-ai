@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 
 const EXAMPLES = [
-  '/example-1.jpg',
-  '/example-2.png',
-  '/example-3.jpg',
+  '/goodnatured-pup-spitz.png',
+  '/goodnatured-pup-example.png',
+  '/goodnatured-pup-golden.png',
 ];
 
 export default function ExampleCarousel() {
@@ -26,7 +26,7 @@ export default function ExampleCarousel() {
       {/* Arrows Outside */}
       <button
         onClick={() => go(-1)}
-        className="absolute -left-10 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-[var(--color-main)] rounded-full p-2 shadow z-20 transition"
+        className="cursor-pointer absolute -left-10 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-[var(--color-main)] rounded-full p-2 shadow z-20 transition"
       >
         <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M15 19l-7-7 7-7" />
@@ -35,7 +35,7 @@ export default function ExampleCarousel() {
 
       <button
         onClick={() => go(1)}
-        className="absolute -right-10 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-[var(--color-main)] rounded-full p-2 shadow z-20 transition"
+        className="cursor-pointer absolute -right-10 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-[var(--color-main)] rounded-full p-2 shadow z-20 transition"
       >
         <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path d="M9 5l7 7-7 7" />
@@ -62,7 +62,7 @@ export default function ExampleCarousel() {
           <button
             key={i}
             onClick={() => setIndex(i)}
-            className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+            className={`cursor-pointer w-2.5 h-2.5 rounded-full transition-all duration-300 ${
               i === index
                 ? 'scale-125 bg-[var(--color-main)] shadow'
                 : 'bg-gray-300 hover:bg-gray-400'

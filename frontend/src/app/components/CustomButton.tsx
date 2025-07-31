@@ -11,7 +11,7 @@ export default function CustomButton({ children, className, ...props }: ButtonPr
         <button
             type="submit"
             className={clsx(
-                "inline-flex items-center gap-2 rounded-full disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed",
+                "cursor-pointer inline-flex items-center gap-2 rounded-full disabled:opacity-40 disabled:shadow-none disabled:cursor-not-allowed",
                 "w-full py-3 px-4 lg:py-4 lg:px-6 justify-center text-center",
                 "focus:outline outline-1 outline-[var(--color-main)]",
                 "relative bg-[var(--color-main)] text-white font-semibold text-sm",

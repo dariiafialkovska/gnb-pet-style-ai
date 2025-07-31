@@ -1,0 +1,17 @@
+{
+  "clothing": {
+    "Hoodie": "wearing a hoodie with a green GNB logo",
+    "T-shirt": "in cotton green GNB logo t-shirt",
+    "Sweater": "wrapped in a sweater with a green GNB logo",
+    "Bandana": "with an bandana with green GNB logo",
+    "Poncho": "in a poncho and white GNB logo",
+    "Scarf": "wearing a cozy scarf with a soft texture and white GNB logo"
+  },
+  "scenario": {
+    "Lemon Fresh Morning": "color of soft lemon, sitting on a clean carpet in a bright, sunlit living room with soft tones and green houseplants",
+    "Lavender Chill Evening": "lavendar color, lying on a soft rug in a warm, plant-filled bedroom with gentle lighting and natural textures",
+    "Orange Grove Adventure": "in orange color, standing in a grassy open field with soft light and distant trees",
+    "Grapefruit Getaway": "in pink color, lounging on a bright couch surrounded by indoor plants and sheer curtains in a relaxed room",
+    "Mahogany Coconut Lounge": "in earhty soft colors, resting on a plush couch with soft pillows and warm wood textures under ambient light"
+  }
+}

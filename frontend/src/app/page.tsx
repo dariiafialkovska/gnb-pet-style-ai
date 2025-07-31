@@ -13,8 +13,21 @@ export default function Home() {
   const [aiImage, setAiImage] = useState<string | null>(null);
   const [sliderValue, setSliderValue] = useState(100);
   const [mode, setMode] = useState<'upload' | 'loading' | 'result'>('upload');
+  const [isMobile, setIsMobile] = useState(false);
+const [scenario, setScenario] = useState('Lemon Fresh Morning');
+const [clothing, setClothing] = useState('Hoodie');
 
-  const isDragging = useRef(false);
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
@@ -29,12 +42,12 @@ export default function Home() {
 const handleGenerate = async () => {
   if (!file) return;
 
-  console.log("📤 Sending file to backend...");
+  console.log("📤 Sending file to backend with:", scenario, clothing);
 
   try {
     setMode('loading');
 
-    const result = await generateImageWithOpenAI(file);
+    const result = await generateImageWithOpenAI(file, scenario, clothing);
 
     console.log("✅ Received AI image from backend:", result);
 
@@ -53,32 +66,40 @@ const handleGenerate = async () => {
   }, [aiImage]);
 
   return (
-    <div className="min-h-screen bg-[#fefefa] flex items-center justify-center">
-      <div className="max-w-10xl w-full flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#fefefa] flex items-center justify-center p-4 sm:p-6">
+      <div className="max-w-6xl w-full flex flex-col items-center justify-center">
         <Header />
-        <div className="bg-[#f4f9f6] rounded-4xl border border-gray-100 overflow-hidden w-full max-w-6xl min-h-[620px] relative px-6 py-8 md:px-10 transition-all duration-500">
+        <div className={`bg-[#f4f9f6] rounded-2xl sm:rounded-4xl border border-gray-100 overflow-hidden w-full transition-all duration-500 ${
+          isMobile 
+            ? 'min-h-fit' // Let content determine height on mobile
+            : 'min-h-[620px] relative' // Fixed height on desktop
+        } ${!isMobile ? 'p-4 sm:px-6 sm:py-8 md:px-10' : ''}`}>
 
           {/* Upload Mode */}
           {mode === 'upload' && (
-            <div className="absolute inset-0 z-20 transition-all duration-500">
-              <UploadSection
-                file={file}
-                previewUrl={previewUrl}
-                handleFileChange={handleFileChange}
-                handleGenerate={handleGenerate}
-              />
+            <div className={isMobile ? '' : 'absolute inset-0 z-20 transition-all duration-500'}>
+             <UploadSection
+  file={file}
+  previewUrl={previewUrl}
+  handleFileChange={handleFileChange}
+  handleGenerate={handleGenerate}
+  selectedScenario={scenario}
+  setSelectedScenario={setScenario}
+  selectedClothing={clothing}
+  setSelectedClothing={setClothing}
+/>
             </div>
           )}
 
           {/* Loading Mode */}
           {mode === 'loading' && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center transition-all duration-500">
+            <div className={isMobile ? 'flex items-center justify-center py-20' : 'absolute inset-0 z-20 flex items-center justify-center transition-all duration-500'}>
               {previewUrl ? (
                 <LoadingPreview imageUrl={previewUrl} />
               ) : (
-                <div className="flex flex-col items-center">
-                  <div className="animate-spin w-10 h-10 border-4 border-t-[var(--color-main)] border-gray-300 rounded-full" />
-                  <p className="mt-4 text-gray-600">Preparing...</p>
+                <div className="flex flex-col items-center px-4">
+                  <div className="animate-spin w-8 h-8 sm:w-10 sm:h-10 border-4 border-t-[var(--color-main)] border-gray-300 rounded-full" />
+                  <p className="mt-4 text-gray-600 text-sm sm:text-base text-center">Preparing...</p>
                 </div>
               )}
             </div>
@@ -86,7 +107,7 @@ const handleGenerate = async () => {
 
           {/* Result Mode */}
           {mode === 'result' && aiImage && previewUrl && (
-            <div className="absolute inset-0 z-20 transition-all duration-500">
+            <div className={isMobile ? '' : 'absolute inset-0 z-20 transition-all duration-500'}>
               <FinalSection
                 previewUrl={previewUrl}
                 aiImage={aiImage}
@@ -96,8 +117,13 @@ const handleGenerate = async () => {
             </div>
           )}
 
+
+
+
         </div>
+        
       </div>
+      
     </div>
   );
 }
