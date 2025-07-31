@@ -17,11 +17,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-def startup_event():
-    aiplatform.init(
-        project=os.getenv("VERTEX_PROJECT_ID"),
-        location="us-central1",
-    )
 
 app.include_router(generate_router, prefix="/api")

@@ -4,14 +4,16 @@ from io import BytesIO
 import base64
 import os
 from openai import OpenAI
-from ..convert_to_png import convert_to_png
+from ..services.convert_to_png import convert_to_png
 from ..services.supabase_uploader import upload_image_to_supabase
+from ..services.logo_overlay import overlay_gnb_logo
+
 
 router = APIRouter()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-PROMPT_BASE = "Same dog wrapped in a lavender sweater with a green GNB patch, lying on a soft rug in a warm, plant-filled bedroom with gentle lighting and natural textures"
+PROMPT_BASE = "Same dog wearing a soft pink GNB summer shirt with a green collar tag, lounging on a bright couch surrounded by indoor plants and sheer curtains in a relaxed room"
 
 @router.post("/generate")
 async def generate(file: UploadFile = File(...)):
@@ -32,7 +34,8 @@ async def generate(file: UploadFile = File(...)):
             model="gpt-image-1",
             image=image_file,
             prompt=PROMPT_BASE,
-            size="1024x1024"
+            size="1024x1024",
+            quality="low"
         )
 
         img_b64 = response.data[0].b64_json
@@ -41,7 +44,11 @@ async def generate(file: UploadFile = File(...)):
         decoded_image = base64.b64decode(img_b64)
         print("📦 Decoded image from base64.")
 
-        image_url = upload_image_to_supabase(decoded_image)
+        # Overlay GNB logo on the generated image
+        print("🌟 Overlaying GNB logo...")
+        logo_overlayed_image = overlay_gnb_logo(decoded_image)
+
+        image_url = upload_image_to_supabase(logo_overlayed_image.getvalue())
         print(f"☁️ Uploaded to Supabase: {image_url}")
 
         return { "image_url": image_url }
