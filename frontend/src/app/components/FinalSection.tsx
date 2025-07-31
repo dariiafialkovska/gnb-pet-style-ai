@@ -120,7 +120,7 @@ export default function FinalSection({
 
           {/* Share paragraph */}
           <p className="text-sm text-gray-600 mb-4">
-            Share your pup's new look on social media!
+            Share your pup&apos;s new look on social media!
           </p>
 
           <div className="w-full flex flex-col gap-3">
