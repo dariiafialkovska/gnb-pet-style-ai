@@ -37,22 +37,19 @@ Delight pet parents by letting them upload a photo of their dog and instantly se
 ## Setup Instructions
 
 ### Frontend (Next.js 14, TypeScript, Tailwind CSS)
-
+```
 cd frontend
 npm install
 npm run dev
-
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload
+```
 
 ### Backend (FastAPI)
-
+```
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 uvicorn backend.main:app --reload --port 8000
+```
 ---
 ## Architecture Diagram
 
@@ -130,3 +127,71 @@ Link each generated image scenario back to a matching GNB product — creating a
 Allow direct camera access on mobile for instant dog photo uploads, reducing friction and improving UX.
 
 ---
+
+## Frontend Testing
+
+We added automated tests to ensure UI stability and simulate core user interactions.
+
+### Test Coverage
+
+- **`UploadSection.test.tsx`** – Verifies upload interface renders and handles file selection properly.
+- **`FinalSection.test.tsx`** – Mocks image download, clipboard, and alert logic for the final result screen.
+- **`Home.test.tsx`** – Full integration test covering:
+  - File upload with validation
+  - Triggering generation
+  - Loading and result display logic
+ 
+### Frontend Test Coverage
+
+| Type          | File                    | Description                                                                 |
+|---------------|-------------------------|-----------------------------------------------------------------------------|
+| Unit          | `UploadSection.test.tsx`| Tests file input UI, drag-and-drop, and file state updates                  |
+| Unit          | `FinalSection.test.tsx` | Mocks download/share/copy-to-clipboard logic for final result section       |
+| Integration   | `Home.test.tsx`         | Full flow: file upload → generate click → loading state → final image render |
+
+
+### Mocking Strategy
+
+- `URL.createObjectURL`, `window.alert`, and `window.open` were mocked to avoid `jsdom` limitations.
+- UI components like `Header`, `UploadSection`, `LoadingPreview`, and `FinalSection` were mocked to isolate logic.
+- The backend call (`generateImageWithOpenAI`) was mocked to simulate a fast and controlled test flow.
+
+### Tools Used
+
+- [`jest`](https://jestjs.io/) – JavaScript testing framework
+- [`@testing-library/react`](https://testing-library.com/docs/react-testing-library/intro/) – DOM-oriented component testing
+
+### Test Location
+
+All test files are stored in:
+src/app/tests/
+```
+ cd frontend
+ npm run test
+```
+---
+## Backend Testing (FastAPI)
+
+The backend uses `pytest` for both **unit tests** (utilities, services) and **integration tests** (FastAPI `/generate` route).
+
+---
+
+### What's Tested
+
+| Type            | File                              | Description                             |
+|-----------------|-----------------------------------|-----------------------------------------|
+| Integration     | `test_generate_route.py`          | Mocks OpenAI + Supabase, tests full `/generate` flow |
+| Unit            | `test_convert_to_png.py`          | Tests PNG conversion logic              |
+| Unit            | `test_overlay_gnb_logo.py`        | Tests logo overlay on image             |
+| Unit            | `test_optimize_input_image.py`    | Tests resizing and compression          |
+| Unit (mocked)   | `test_supabase_uploader.py`       | Mocks upload to Supabase                |
+
+---
+
+### Run Tests
+
+```bash
+# Run all tests from project root
+pytest backend/tests -vs
+
+
