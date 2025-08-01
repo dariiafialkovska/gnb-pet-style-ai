@@ -71,7 +71,7 @@ export default function UploadSection({
         <div className="relative w-full max-w-md mb-6">
           <input
             type="file"
-            accept="image/*"
+            accept="image/png, image/jpeg"
             onChange={handleFileChange}
             className="hidden"
             id="file-upload"
@@ -104,11 +104,10 @@ export default function UploadSection({
               <button
                 key={item.label}
                 onClick={() => setSelectedScenario(item.label)}
-                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-150 text-sm ${
-                  selectedScenario === item.label
+                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full border transition-all duration-150 text-sm ${selectedScenario === item.label
                     ? 'border-[var(--color-main)] bg-[var(--color-main)]/10'
                     : 'border-gray-300 bg-white hover:border-[var(--color-main)]'
-                }`}
+                  }`}
               >
                 <span
                   className="w-3 h-3 rounded-full"
@@ -128,11 +127,10 @@ export default function UploadSection({
               <button
                 key={option}
                 onClick={() => setSelectedClothing(option)}
-                className={`cursor-pointer px-4 py-2 rounded-full border transition-all duration-150 text-sm whitespace-nowrap ${
-                  selectedClothing === option
+                className={`cursor-pointer px-4 py-2 rounded-full border transition-all duration-150 text-sm whitespace-nowrap ${selectedClothing === option
                     ? 'border-[var(--color-main)] bg-[var(--color-main)]/10'
                     : 'border-gray-300 bg-white hover:border-[var(--color-main)]'
-                }`}
+                  }`}
               >
                 {option}
               </button>

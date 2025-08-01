@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from 'react-hot-toast';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,18 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-figtree bg-[#0f0f11] text-white">
-        {children}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#fff',
+              color: '#111',
+              borderRadius: '8px',
+              border: '1px solid #ddd',
+            },
+          }}
+        />        {children}
       </body>
     </html>
   );

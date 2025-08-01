@@ -6,6 +6,7 @@ import UploadSection from './components/UploadSection';
 import FinalSection from './components/FinalSection';
 import LoadingPreview from './components/LoadingPreview';
 import { generateImageWithOpenAI } from '@/lib/api';
+import { toast } from 'react-hot-toast';
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
@@ -14,8 +15,8 @@ export default function Home() {
   const [sliderValue, setSliderValue] = useState(100);
   const [mode, setMode] = useState<'upload' | 'loading' | 'result'>('upload');
   const [isMobile, setIsMobile] = useState(false);
-const [scenario, setScenario] = useState('Lemon Fresh Morning');
-const [clothing, setClothing] = useState('Hoodie');
+  const [scenario, setScenario] = useState('Lemon Fresh Morning');
+  const [clothing, setClothing] = useState('Hoodie');
 
 
   // Check if mobile on mount and resize
@@ -23,7 +24,7 @@ const [clothing, setClothing] = useState('Hoodie');
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024); // lg breakpoint
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -31,34 +32,48 @@ const [clothing, setClothing] = useState('Hoodie');
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
-    if (selected) {
-      setFile(selected);
-      setPreviewUrl(URL.createObjectURL(selected));
-      setAiImage(null);
+    if (!selected) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+
+    if (!allowedTypes.includes(selected.type)) {
+      toast.error('Only PNG and JPEG files are allowed.');
+      return;
+    }
+
+    if (selected.size > maxSize) {
+      toast.error('Image size must be less than 10MB.');
+      return;
+    }
+
+    setFile(selected);
+    setPreviewUrl(URL.createObjectURL(selected));
+    setAiImage(null);
+    setMode('upload');
+  };
+
+
+  const handleGenerate = async () => {
+    if (!file) return;
+
+    console.log("📤 Sending file to backend with:", scenario, clothing);
+
+    try {
+      setMode('loading');
+
+      const result = await generateImageWithOpenAI(file, scenario, clothing);
+
+      console.log("✅ Received AI image from backend:", result);
+
+      setAiImage(result);
+      setMode('result');
+    } catch (err) {
+      console.error("❌ Error in handleGenerate:", err);
+      toast.error("Something went wrong");
       setMode('upload');
     }
   };
-
-const handleGenerate = async () => {
-  if (!file) return;
-
-  console.log("📤 Sending file to backend with:", scenario, clothing);
-
-  try {
-    setMode('loading');
-
-    const result = await generateImageWithOpenAI(file, scenario, clothing);
-
-    console.log("✅ Received AI image from backend:", result);
-
-    setAiImage(result);
-    setMode('result');
-  } catch (err) {
-    console.error("❌ Error in handleGenerate:", err);
-    alert("Something went wrong");
-    setMode('upload');
-  }
-};
 
 
   useEffect(() => {
@@ -69,25 +84,24 @@ const handleGenerate = async () => {
     <div className="min-h-screen bg-[#fefefa] flex items-center justify-center p-4 sm:p-6">
       <div className="max-w-6xl w-full flex flex-col items-center justify-center">
         <Header />
-        <div className={`bg-[#f4f9f6] rounded-2xl sm:rounded-4xl border border-gray-100 overflow-hidden w-full transition-all duration-500 ${
-          isMobile 
-            ? 'min-h-fit' // Let content determine height on mobile
-            : 'min-h-[620px] relative' // Fixed height on desktop
-        } ${!isMobile ? 'p-4 sm:px-6 sm:py-8 md:px-10' : ''}`}>
+        <div className={`bg-[#f4f9f6] rounded-2xl sm:rounded-4xl border border-gray-100 overflow-hidden w-full transition-all duration-500 ${isMobile
+          ? 'min-h-fit' // Let content determine height on mobile
+          : 'min-h-[620px] relative' // Fixed height on desktop
+          } ${!isMobile ? 'p-4 sm:px-6 sm:py-8 md:px-10' : ''}`}>
 
           {/* Upload Mode */}
           {mode === 'upload' && (
             <div className={isMobile ? '' : 'absolute inset-0 z-20 transition-all duration-500'}>
-             <UploadSection
-  file={file}
-  previewUrl={previewUrl}
-  handleFileChange={handleFileChange}
-  handleGenerate={handleGenerate}
-  selectedScenario={scenario}
-  setSelectedScenario={setScenario}
-  selectedClothing={clothing}
-  setSelectedClothing={setClothing}
-/>
+              <UploadSection
+                file={file}
+                previewUrl={previewUrl}
+                handleFileChange={handleFileChange}
+                handleGenerate={handleGenerate}
+                selectedScenario={scenario}
+                setSelectedScenario={setScenario}
+                selectedClothing={clothing}
+                setSelectedClothing={setClothing}
+              />
             </div>
           )}
 
@@ -121,9 +135,9 @@ const handleGenerate = async () => {
 
 
         </div>
-        
+
       </div>
-      
+
     </div>
   );
 }
