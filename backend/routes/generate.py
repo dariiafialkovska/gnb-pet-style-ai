@@ -8,6 +8,8 @@ from ..services.convert_to_png import convert_to_png
 from ..services.supabase_uploader import upload_image_to_supabase
 from ..services.logo_overlay import overlay_gnb_logo
 from ..utils.prompts import build_prompt
+from ..services.optimize_images import optimize_input_image
+import time
 
 router = APIRouter()
 
@@ -21,41 +23,121 @@ async def generate(
     scenario: str = Form(None),
     clothing: str = Form(None)
 ):
+    total_start = time.time()
     print("📥 Received file:", file.filename)
     print("🎨 Scenario:", scenario, "| Clothing:", clothing)
 
     try:
+        # File reading timing
+        read_start = time.time()
         image_bytes = await file.read()
+        read_time = time.time() - read_start
+        print(f"⏱️ File read time: {read_time:.3f}s")
 
-        if not file.filename.lower().endswith(".png"):
+        # PNG conversion timing (if needed)
+        convert_start = time.time()
+        if not file.filename.lower().endswith((".png", ".jpg", ".jpeg")):
             image_bytes = convert_to_png(image_bytes)
+        convert_time = time.time() - convert_start
+        if convert_time > 0.001:  # Only log if significant
+            print(f"⏱️ PNG conversion time: {convert_time:.3f}s")
 
-        image_file = BytesIO(image_bytes)
-        image_file.name = "dog.png"
+        # 🚀 OPTIMIZE IMAGE FOR SPEED
+        optimized_image, compression_stats = optimize_input_image(
+            image_bytes, 
+            max_size=512,  # Smaller = faster (use 256 for even more speed)
+            quality=85     # Balance between quality and speed
+        )
+        
+        # Set the filename for OpenAI
+        optimized_image.name = "dog.jpg"  # Use .jpg since we're optimizing as JPEG
 
+        # Build prompt timing
+        prompt_start = time.time()
         prompt = build_prompt(scenario, clothing)
+        prompt_time = time.time() - prompt_start
         print("🧠 Final prompt:", prompt)
+        print(f"⏱️ Prompt build time: {prompt_time:.3f}s")
 
+        # 🎯 OpenAI API call timing
+        print("🚀 Starting OpenAI API call...")
+        openai_start = time.time()
+        
         response = client.images.edit(
             model="gpt-image-1",
-            image=image_file,
+            image=optimized_image,
             prompt=prompt,
-            size="1024x1024",
-            quality="low"
+            size="1024x1024",        # 🚀 Smaller size = faster processing
+            quality="low",         # Keep low for speed
+            output_format="jpeg",
+            output_compression=80  # Good balance
         )
+        
+        openai_time = time.time() - openai_start
+        print(f"⏱️ OpenAI API time: {openai_time:.3f}s")
 
+        # Image processing timing
+        process_start = time.time()
         img_b64 = response.data[0].b64_json
         decoded_image = base64.b64decode(img_b64)
+        process_time = time.time() - process_start
+        print(f"⏱️ Image decode time: {process_time:.3f}s")
 
+        # Logo overlay timing
+        overlay_start = time.time()
         logo_overlayed_image = overlay_gnb_logo(decoded_image)
-        image_url = upload_image_to_supabase(logo_overlayed_image.getvalue())
+        overlay_time = time.time() - overlay_start
+        print(f"⏱️ Logo overlay time: {overlay_time:.3f}s")
 
-        return {"image_url": image_url}
+        # Upload timing
+        upload_start = time.time()
+        image_url = upload_image_to_supabase(logo_overlayed_image.getvalue())
+        upload_time = time.time() - upload_start
+        print(f"⏱️ Upload time: {upload_time:.3f}s")
+
+        # Total timing summary
+        total_time = time.time() - total_start
+        
+        print("\n" + "="*50)
+        print("📊 PERFORMANCE SUMMARY")
+        print("="*50)
+        print(f"📁 File read:        {read_time:.3f}s")
+        print(f"🔄 PNG conversion:   {convert_time:.3f}s") 
+        print(f"🗜️  Image compression: {compression_stats['compression_time']:.3f}s")
+        print(f"   └─ Size reduction: {compression_stats['compression_ratio']:.1f}%")
+        print(f"   └─ {compression_stats['original_size']:,} → {compression_stats['compressed_size']:,} bytes")
+        print(f"🧠 Prompt build:     {prompt_time:.3f}s")
+        print(f"🤖 OpenAI API:       {openai_time:.3f}s  ⭐ MAIN BOTTLENECK")
+        print(f"🖼️  Image decode:     {process_time:.3f}s")
+        print(f"🎨 Logo overlay:     {overlay_time:.3f}s")
+        print(f"☁️  Upload:           {upload_time:.3f}s")
+        print(f"⏱️  TOTAL TIME:       {total_time:.3f}s")
+        
+        # Performance insights
+        if openai_time > 3:
+            print("💡 OpenAI is slow - try smaller image size or simpler prompt")
+        if compression_stats['compression_time'] > 0.5:
+            print("💡 Compression is slow - reduce max_size or quality")
+        if upload_time > 1:
+            print("💡 Upload is slow - check network/Supabase performance")
+            
+        print("="*50)
+
+        return {
+            "image_url": image_url,
+            "performance": {
+                "total_time": round(total_time, 3),
+                "openai_time": round(openai_time, 3),
+                "compression_time": round(compression_stats['compression_time'], 3),
+                "compression_ratio": round(compression_stats['compression_ratio'], 1),
+                "upload_time": round(upload_time, 3)
+            }
+        }
 
     except Exception as e:
-        print("❌ OpenAI Error:", e)
-        return {"error": str(e)}
-
+        total_time = time.time() - total_start
+        print(f"❌ OpenAI Error after {total_time:.3f}s:", e)
+        return {"error": str(e), "total_time": round(total_time, 3)}
 
 @router.post("/generate-dalle")
 async def generate_dalle():
