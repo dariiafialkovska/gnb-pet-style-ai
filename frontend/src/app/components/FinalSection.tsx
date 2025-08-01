@@ -10,7 +10,7 @@ type FinalSectionProps = {
   sliderValue: number;
   setSliderValue: (value: number) => void;
 };
-
+// FinalSection component that displays the final styled image and options to download or share
 export default function FinalSection({
   previewUrl,
   aiImage,
@@ -18,7 +18,7 @@ export default function FinalSection({
   setSliderValue,
 }: FinalSectionProps) {
   const [view, setView] = useState<'before' | 'after'>('after');
-
+  // Function to handle downloading the AI-styled image
   const handleDownload = async () => {
     try {
       // Fetch the image as a blob to handle cross-origin issues
@@ -45,6 +45,7 @@ export default function FinalSection({
     }
   };
 
+  // Function to handle sharing on social media
   const handleShare = (platform: 'instagram' | 'facebook') => {
     const hashtags = '#GoodNaturedPup';
     const mention = '@goodnaturedbrand';

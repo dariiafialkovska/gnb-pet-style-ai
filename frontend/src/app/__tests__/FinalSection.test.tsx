@@ -4,6 +4,7 @@ import FinalSection from '../components/FinalSection'
 const previewUrl = 'https://example.com/preview.jpg'
 const aiImage = 'https://example.com/ai.jpg'
 
+// Mock the global fetch function
 describe('FinalSection', () => {
   const setSliderValue = jest.fn()
 

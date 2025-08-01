@@ -1,5 +1,6 @@
 import React from 'react';
 
+// Header component that displays the main title and description for the Good Natured Look Generator
 export default function Header() {
   return (
     <div className="text-center mb-8">

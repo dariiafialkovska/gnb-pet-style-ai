@@ -2,6 +2,7 @@
 from io import BytesIO
 from PIL import Image
 
+# Function to convert image bytes to PNG format
 def convert_to_png(file_bytes: bytes) -> bytes:
     with BytesIO(file_bytes) as input_io:
         with Image.open(input_io) as img:

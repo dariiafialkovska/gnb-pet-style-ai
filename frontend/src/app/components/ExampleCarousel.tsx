@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 
+// Example images for the carousel
 const EXAMPLES = [
   '/goodnatured-pup-spitz.png',
   '/goodnatured-pup-example.png',
   '/goodnatured-pup-golden.png',
 ];
-
+// ExampleCarousel component that displays a carousel of images with navigation arrows and dot indicators
 export default function ExampleCarousel() {
   const [index, setIndex] = useState(0);
   const total = EXAMPLES.length;

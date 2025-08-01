@@ -7,27 +7,29 @@ from backend.main import app
 
 client = TestClient(app)
 
-
+# Fixtures for test files
 @pytest.fixture
 def dummy_file():
     return ("dog.jpg", BytesIO(b"fake-image-bytes"), "image/jpeg")
 
-
+# Fixtures for different file types
 @pytest.fixture
 def non_image_file():
     return ("text.txt", BytesIO(b"not-an-image"), "text/plain")
 
-
+# Fixtures for WebP file
 @pytest.fixture
 def webp_file():
     return ("dog.webp", BytesIO(b"webp-bytes"), "image/webp")
 
 
+# Tests for the /generate endpoint
 @patch("backend.routes.generate.upload_image_to_supabase")
 @patch("backend.routes.generate.overlay_gnb_logo")
 @patch("backend.routes.generate.client.images.edit")
 @patch("backend.routes.generate.optimize_input_image")
 @patch("backend.routes.generate.build_prompt")
+# Test successful image generation
 def test_generate_success(
     mock_build_prompt,
     mock_optimize_input,
@@ -70,6 +72,7 @@ def test_generate_success(
     assert "openai_time" in json_data["performance"]
 
 
+# Test handling of non-image file
 @patch("backend.routes.generate.client.images.edit", side_effect=Exception("OpenAI failed"))
 @patch("backend.routes.generate.upload_image_to_supabase")
 @patch("backend.routes.generate.overlay_gnb_logo")
@@ -102,7 +105,7 @@ def test_generate_openai_failure(
     assert "error" in json_data
     assert json_data["error"] == "OpenAI failed"
 
-
+# Test that PNG conversion is triggered for WebP files
 @patch("backend.routes.generate.convert_to_png")
 @patch("backend.routes.generate.client.images.edit")
 @patch("backend.routes.generate.optimize_input_image")
@@ -144,12 +147,12 @@ def test_generate_triggers_png_conversion(
     assert response.status_code == 200
     assert mock_convert.called
 
-
+# Test handling of missing file
 def test_generate_missing_file():
     response = client.post("/api/generate", data={"scenario": "Any", "clothing": "Any"})
     assert response.status_code == 422  # FastAPI validation
 
-
+# Test handling of non-image file
 @patch("backend.routes.generate.client.images.edit")
 @patch("backend.routes.generate.optimize_input_image")
 @patch("backend.routes.generate.upload_image_to_supabase", side_effect=Exception("Supabase down"))
@@ -188,7 +191,7 @@ def test_generate_upload_failure(
     assert "error" in response.json()
     assert "Supabase down" in response.json()["error"]
 
-
+# Test handling of missing optional fields
 @patch("backend.routes.generate.build_prompt")
 def test_generate_with_missing_optional_fields(mock_prompt, dummy_file):
     mock_prompt.return_value = "Default prompt"

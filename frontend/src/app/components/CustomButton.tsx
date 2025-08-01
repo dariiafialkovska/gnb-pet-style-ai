@@ -6,6 +6,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     children: React.ReactNode;
 };
 
+// CustomButton component that can be used throughout the application with the style of Good Natured Brand
 export default function CustomButton({ children, className, ...props }: ButtonProps) {
     return (
         <button

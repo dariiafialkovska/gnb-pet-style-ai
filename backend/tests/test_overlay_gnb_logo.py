@@ -3,6 +3,7 @@ from PIL import Image
 from io import BytesIO
 from ..services.logo_overlay import overlay_gnb_logo
 
+# Test that the overlay_gnb_logo function adds the logo correctly
 def test_overlay_gnb_logo_adds_logo():
     base_img = Image.new("RGBA", (500, 500), color=(255, 255, 255, 255))
     buffer = BytesIO()

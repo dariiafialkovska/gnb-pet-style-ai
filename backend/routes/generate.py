@@ -18,6 +18,7 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 PROMPT_BASE = "Same dog in a dark brown sweater with a green GNB patch, resting on a plush couch with soft pillows and warm wood textures under ambient light"
 
+# Generate image using OpenAI's GPT-Image model
 @router.post("/generate")
 async def generate(
     file: UploadFile = File(...),
@@ -140,6 +141,8 @@ async def generate(
         print(f"❌ OpenAI Error after {total_time:.3f}s:", e)
         return {"error": str(e), "total_time": round(total_time, 3)}
 
+
+# Used for testing DALL·E 3 generation
 @router.post("/generate-dalle")
 async def generate_dalle():
     try:
@@ -162,7 +165,7 @@ async def generate_dalle():
         print("❌ DALL·E Error:", e)
         return {"error": str(e)}
 
-
+#Used for testing Imagen generation
 @router.post("/generate-imagen")
 async def generate_imagen(file: UploadFile = File(...)):
     try:
@@ -211,7 +214,7 @@ async def generate_imagen(file: UploadFile = File(...)):
 
 FLUX_API_URL = "https://api.aimlapi.com/v1/images/generations"
 FLUX_API_KEY = os.getenv("FLUX_API_KEY")
-
+#Used for testing Flux generation
 @router.post("/generate-flux")
 async def generate_flux(
     file: UploadFile = File(...),

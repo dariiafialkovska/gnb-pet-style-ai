@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Upload } from 'lucide-react';
 import ExampleCarousel from './ExampleCarousel';
 import CustomButton from './CustomButton';
-
+// Define scenarios and clothing options for the upload section
 const SCENARIOS = [
   { label: 'Lemon Fresh Morning', color: '#fef08a' },
   { label: 'Lavender Chill Evening', color: '#c084fc' },
@@ -10,7 +10,7 @@ const SCENARIOS = [
   { label: 'Grapefruit Getaway', color: '#f87171' },
   { label: 'Mahogany Coconut Lounge', color: '#92400e' },
 ];
-
+// Define clothing options for the upload section
 const CLOTHING_OPTIONS = [
   'Hoodie',
   'T-shirt',
@@ -31,6 +31,7 @@ type UploadSectionProps = {
   setSelectedClothing: (value: string) => void;
 };
 
+// UploadSection component that allows users to upload a photo, select scenarios and clothing options
 export default function UploadSection({
   file,
   previewUrl,

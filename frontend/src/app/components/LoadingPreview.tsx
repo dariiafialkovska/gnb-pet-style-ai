@@ -14,6 +14,7 @@ const phrases = [
   "GNB magic in progress…",
 ];
 
+// LoadingPreview component that displays a loading state with an image and animated text
 export default function LoadingPreview({ imageUrl }: LoadingPreviewProps) {
   const [currentPhrase, setCurrentPhrase] = useState(phrases[0]);
 

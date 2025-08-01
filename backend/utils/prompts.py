@@ -1,6 +1,8 @@
 import json
 import os
 
+# File for storing base prompt and clothing/scenario descriptions
+
 PROMPT_BASE = "Same dog"
 
 # Load JSON once when module loads

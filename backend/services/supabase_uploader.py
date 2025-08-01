@@ -16,11 +16,13 @@ if not SUPABASE_URL or not SUPABASE_API_KEY:
 
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_API_KEY)
 
+# Function to upload image bytes to Supabase storage
 def upload_image_to_supabase(image_bytes: bytes, extension="png") -> str:
     filename = f"{uuid4().hex}.{extension}"
     filepath = filename
     print(f"📦 Uploading image to Supabase: {filepath}")
 
+    # Upload the image bytes to Supabase storage
     response = supabase.storage.from_("dog-ai-images").upload(
         path=filepath,
         file=image_bytes,
@@ -29,6 +31,7 @@ def upload_image_to_supabase(image_bytes: bytes, extension="png") -> str:
 
     print(f"📨 Upload response: {response}")
 
+    # Check for errors in the response
     if hasattr(response, "error") and response.error is not None:
         raise Exception(f"❌ Upload failed: {response.error}")
 

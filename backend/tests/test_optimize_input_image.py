@@ -12,6 +12,7 @@ def test_optimize_image_compression():
 
     optimized_buffer, stats = optimize_input_image(original_bytes)
 
+    # Check that the optimized image is smaller than the original
     assert isinstance(optimized_buffer, BytesIO)
     assert stats["compressed_size"] < stats["original_size"]
     assert "compression_ratio" in stats

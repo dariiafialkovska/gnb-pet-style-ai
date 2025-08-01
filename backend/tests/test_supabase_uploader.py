@@ -2,6 +2,7 @@
 from unittest.mock import patch, MagicMock
 from ..services.supabase_uploader import upload_image_to_supabase
 
+# Test successful image upload to Supabase
 @patch("backend.services.supabase_uploader.supabase")
 def test_upload_image_success(mock_supabase):
     mock_upload = MagicMock()
@@ -13,6 +14,7 @@ def test_upload_image_success(mock_supabase):
     assert result.startswith("http")
     assert result.endswith(".jpeg")
 
+# Test handling of missing environment variables
 @patch("backend.services.supabase_uploader.supabase")
 def test_upload_image_failure(mock_supabase):
     mock_upload = MagicMock()
