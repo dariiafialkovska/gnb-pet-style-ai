@@ -44,7 +44,11 @@ describe('FinalSection', () => {
 
   it('clicking Download fetches image', async () => {
     const blob = new Blob(['dummy'], { type: 'image/png' })
-    global.fetch = jest.fn().mockResolvedValueOnce({ blob: () => Promise.resolve(blob) }) as any
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        blob: () => Promise.resolve(blob),
+      })
+    ) as jest.Mock;
 
     render(
       <FinalSection
