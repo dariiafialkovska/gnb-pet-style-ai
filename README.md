@@ -130,3 +130,38 @@ Link each generated image scenario back to a matching GNB product — creating a
 Allow direct camera access on mobile for instant dog photo uploads, reducing friction and improving UX.
 
 ---
+
+## Frontend Testing
+
+We added automated tests to ensure UI stability and simulate core user interactions.
+
+### Test Coverage
+
+- **`UploadSection.test.tsx`** – Verifies upload interface renders and handles file selection properly.
+- **`FinalSection.test.tsx`** – Mocks image download, clipboard, and alert logic for the final result screen.
+- **`Home.test.tsx`** – Full integration test covering:
+  - File upload with validation
+  - Triggering generation
+  - Loading and result display logic
+
+### Mocking Strategy
+
+- `URL.createObjectURL`, `window.alert`, and `window.open` were mocked to avoid `jsdom` limitations.
+- UI components like `Header`, `UploadSection`, `LoadingPreview`, and `FinalSection` were mocked to isolate logic.
+- The backend call (`generateImageWithOpenAI`) was mocked to simulate a fast and controlled test flow.
+
+### Tools Used
+
+- [`jest`](https://jestjs.io/) – JavaScript testing framework
+- [`@testing-library/react`](https://testing-library.com/docs/react-testing-library/intro/) – DOM-oriented component testing
+
+### Test Location
+
+All test files are stored in:
+src/app/tests/
+```
+ cd frontend
+ npm run test
+```
+
+
