@@ -1,5 +1,5 @@
 # routes/generate.py
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from io import BytesIO
 import base64
 import os
@@ -10,6 +10,7 @@ from ..services.logo_overlay import overlay_gnb_logo
 from ..utils.prompts import build_prompt
 from ..services.optimize_images import optimize_input_image
 import time
+import requests
 
 router = APIRouter()
 
@@ -206,3 +207,80 @@ async def generate_imagen(file: UploadFile = File(...)):
     except Exception as e:
         print("❌ Imagen Error:", e)
         return {"error": str(e)}
+
+
+FLUX_API_URL = "https://api.aimlapi.com/v1/images/generations"
+FLUX_API_KEY = os.getenv("FLUX_API_KEY")
+
+@router.post("/generate-flux")
+async def generate_flux(
+    file: UploadFile = File(...),
+    scenario: str = Form(None),
+    clothing: str = Form(None)
+):
+    total_start = time.time()
+    print("📥 Flux file received:", file.filename)
+    print("🎨 Scenario:", scenario, "| Clothing:", clothing)
+
+    try:
+        # Read image bytes
+        image_bytes = await file.read()
+
+        # Upload to Supabase temporarily to get a public image URL for Flux
+        temp_image_url = upload_image_to_supabase(image_bytes)
+        print("☁️ Uploaded temp image for Flux:", temp_image_url)
+
+        # Build prompt
+        prompt = build_prompt(scenario, clothing)
+        print("🧠 Flux prompt:", prompt)
+
+        # Call Flux API
+        start_flux = time.time()
+        response = requests.post(
+            FLUX_API_URL,
+            headers={
+                "Authorization": f"Bearer {FLUX_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "image_url": temp_image_url,
+                "prompt": prompt,
+                "model": "flux/kontext-max/image-to-image",
+            },
+            timeout=60
+        )
+        flux_time = time.time() - start_flux
+        print(f"⚡ Flux API time: {flux_time:.2f}s")
+
+        if not response.ok:
+            raise HTTPException(status_code=response.status_code, detail=response.text)
+
+        data = response.json()
+        if "data" not in data or not data["data"]:
+            raise HTTPException(status_code=500, detail="Flux returned no image.")
+
+        generated_image_url = data["data"][0]["url"]
+
+        # Download the generated image
+        img_response = requests.get(generated_image_url)
+        img_response.raise_for_status()
+
+        # Upload Flux result to Supabase
+        final_url = upload_image_to_supabase(img_response.content)
+        total_time = time.time() - total_start
+
+        print("✅ Flux generation complete:", final_url)
+        print(f"⏱️ Total Flux route time: {total_time:.2f}s")
+
+        return {
+            "image_url": final_url,
+            "performance": {
+                "total_time": round(total_time, 2),
+                "flux_api_time": round(flux_time, 2)
+            }
+        }
+
+    except Exception as e:
+        total_time = time.time() - total_start
+        print(f"❌ Flux Error after {total_time:.2f}s:", e)
+        raise HTTPException(status_code=500, detail=str(e))
