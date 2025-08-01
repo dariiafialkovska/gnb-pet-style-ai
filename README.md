@@ -5,7 +5,13 @@ Delight pet parents by letting them upload a photo of their dog and instantly se
 ---
 
 ## Live Demo
-[(https://gnb-pet-style-ai.vercel.app/](https://gnb-pet-style-ai.vercel.app/)
+[https://gnb-pet-style-ai.vercel.app/](https://gnb-pet-style-ai.vercel.app/)
+
+<img width="180" height="180" alt="dd3f27365fbe4f11b9d45b47964a213f" src="https://github.com/user-attachments/assets/5d809e35-da83-4ff5-9e63-7bb8b2a7b4ba" />
+<img width="180" height="180" alt="gnb-styled-dog (3)" src="https://github.com/user-attachments/assets/dcca9f47-fd16-4c20-8d70-4259fb0f97fa" />
+<img width="180" height="180" alt="507ff847e6c645a0b582cda9920deb62" src="https://github.com/user-attachments/assets/885f3176-4468-4421-b7d5-107e55ffcd43" />
+<img width="180" height="180" alt="goodnatured-pup (8)" src="https://github.com/user-attachments/assets/7ed1f613-33d0-4b05-8ac0-7523454b76be" />
+<img width="180" height="180" alt="goodnatured-pup (15)" src="https://github.com/user-attachments/assets/9751854d-99e7-4502-848c-e54b0ba7d70c" />
 
 ---
 
@@ -193,5 +199,6 @@ The backend uses `pytest` for both **unit tests** (utilities, services) and **in
 ```bash
 # Run all tests from project root
 pytest backend/tests -vs
+```
 
 
